@@ -17,13 +17,21 @@ int main()
     {
         if(FibLoop(i) == FibRec(i))
         {
-            cout << i << " " << FibLoop(i) << endl;
+			if(i < 10)
+			{
+            	cout << i << " ----> " << FibLoop(i) << endl;
+			}
+			else
+			{
+				cout << i << " ---> " << FibLoop(i) << endl;
+			}
         }
     }
     
     return 0;
 }
 
+// Regular looping Fibonacci calculator
 double FibLoop( int n )
 {
     if(n < 0)
@@ -52,6 +60,7 @@ double FibLoop( int n )
     return arr[n];
 }
 
+// Recursive Fibonacci calculator. More efficient. 
 double FibRec( int n )
 {
     if(n <= 0)

@@ -16,12 +16,18 @@ int main()
     
     double Fn = 0;
     
+	
+	/* Begins putting data into a file test2.csv.
+		Counts the number of adds to array as well as
+		the number of calls for the Recursive function */
     ofstream outFS; 
-    outFS.open("test2.csv");
+    outFS.open("test2.txt");
     
     for(int n = 1; n <= MAX_N; n++)
     {
         Fn = FibLoopCount(n, adds, calls);
+		cout << "Fibnacci num = " << Fn << " with n = "<< n << endl;
+		
         outFS << n << ", " << adds << ", " << calls << ", ";
         
         calls = 0;
