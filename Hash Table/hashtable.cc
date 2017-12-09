@@ -20,6 +20,7 @@ using namespace std;
 int hashSlingingSlasher(double key_val)
 {
     //This function creates the index (hashedVal) of where to place the key_val
+	//7919, 28411, and 101 are all prime
     int x = floor(key_val);
     double y = (key_val - x);
     int z = floor(y * 7919);
@@ -43,7 +44,7 @@ int hashSlingingSlasher(string key_val)
     return hashedVal;
 }
 
-enum EntryType {ACTIVE, EMPTY, DELETED};                //important
+enum EntryType {ACTIVE, EMPTY, DELETED};      //important
 
 template<typename Comparable>
 class GenericTree
@@ -70,7 +71,7 @@ class GenericTree
             Comparable key_val;
             TreeNode *key_loc;
             EntryType info;
-            HashEntry( const Comparable & e = Comparable ( ),               //I dont even think i used this bullshit
+            HashEntry( const Comparable & e = Comparable ( ),     
              TreeNode * const n = NULL,
              EntryType i = EMPTY) : key_val( e ), key_loc ( n ), info( i ) { }
         };
@@ -80,16 +81,19 @@ class GenericTree
                 vector<HashEntry> array;
                 
             public:
-                HashTable()                     //resizes array to 101 and initializes
+				//resizes array to 101 and initializes
+                HashTable()              
                 {
                     array.resize(101);
                     makeEmpty();
                     return;
                 }
-                
-                void insert(Comparable key_val, TreeNode* key_loc)        //hashes and inserts a key value into the array
+				
+                //hashes and inserts a key value into the array
+                void insert(Comparable key_val, TreeNode* key_loc)      
                 {
-                    int index = hashSlingingSlasher(key_val);             //Calls hashing function, which is located globally in order to overload string or double
+					//Calls hashing function, which is located globally in order to overload string or double
+                    int index = hashSlingingSlasher(key_val);             
                     cout << "key_val: " << key_val << "    index: " << index << endl;
                     array[index].key_val = key_val;
                     array[index].key_loc = key_loc;
@@ -98,7 +102,8 @@ class GenericTree
                     return;
                 }
                 
-                void makeEmpty()                                            //initializes an EMPTY table
+				//initializes an EMPTY table
+                void makeEmpty()
                 {
                     for(int i = 0; i < array.size(); i++)
                     {
@@ -106,9 +111,9 @@ class GenericTree
                     }
                     return;
                 }
-                
-                bool findHash(Comparable key_val, TreeNode* & key_loc)      //Searches through hash table for key value, "returns" key_loc implicitly
-                {
+				
+                //Searches through hash table for key value, "returns" key_loc implicitly
+                bool findHash(Comparable key_val, TreeNode* & key_loc)                      {
                     
                     for(int i = 0; i < array.size() - 1; i++)
                     {
@@ -122,7 +127,8 @@ class GenericTree
                     return false;
                 }
                 
-                void dump_hash_table()                  //Just a funky print format he wants. ch = 34 is ASCII for double quotes
+				//Just a fancy print function essentially
+                void dump_hash_table() 
                 {
                     char ch = 34;
                     for(int i = 0; i < array.size(); i++)
@@ -142,10 +148,10 @@ class GenericTree
                 }
         };
         
-        HashTable htable;           //Added this bad boy
+        HashTable htable;
         TreeNode *root;
         
-        //Unchanged
+        //Taken from Generic Tree
         void set_height(TreeNode *rt)
         {
             if(rt->firstChild == NULL)
@@ -186,52 +192,71 @@ class GenericTree
             {
                 return;
             }
-            
+			
+            //recursive call towards right
             if(rt->nextSibling != NULL)
             {
-                hang_left(rt->nextSibling);                         //recursive call towards right
+                hang_left(rt->nextSibling);                         
             }
             
+			//recursive call downwards
             if(rt->firstChild != NULL)
             {
-                hang_left(rt->firstChild);                          //recursive call downwards
+                hang_left(rt->firstChild);                          
                 
-                //starts here once we reach the bottom right of tree and the recursion starts backtracking
+                /* starts here once we reach the bottom right of tree 
+				and the recursion starts backtracking */
+				
+                //declares a pointer to the current rt's firstChild.
+                TreeNode* i = rt->firstChild;                       
                 
-                TreeNode* i = rt->firstChild;                       //declares a pointer to the current rt's firstChild.
+				//initializes an empty priority queue, where each spot contains the height and a pointer to a child
+                priority_queue<pair<int, TreeNode*> > childQ;       
                 
-                priority_queue<pair<int, TreeNode*> > childQ;       //initializes an empty priority queue, where each spot contains the height and a pointer to a child
-                
-                while(i != NULL)                                    //so long as current rt has children, we add each child's height and pointer to the queue,
-                {                                                   //then increment the pointer
-                    
+				//so long as current rt has children, we add each child's height and pointer to the queue,
+                while(i != NULL)                                    
+                {                                                   
+                    //then increment the pointer
                     childQ.push(make_pair(i->height, i));
                     
                     i = i->nextSibling;
                 }
                 
-                TreeNode* current = rt;                             //declares a new pointer to current rt
-                                    
-                pair<int, TreeNode*> p = childQ.top();              //extracts a pair (height and pointer) from top of queue, priority queue is sorted in decreasing order
-                current->firstChild = p.second;                     //sets first child equal to the pointer on top of queue
-                childQ.pop();                                       //pops the top of the queue
+				//declares a new pointer to current rt
+                TreeNode* current = rt;                             
                 
-                current = rt->firstChild;                           //changes current to rt's firstChild
+				//extracts a pair (height and pointer) from top of queue, priority queue is sorted in decreasing order                    
+                pair<int, TreeNode*> p = childQ.top();
+				   
+				//sets first child equal to the pointer on top of queue           
+                current->firstChild = p.second;
+				
+				//pops the top of the queue                     
+                childQ.pop();                                       
+                
+				//changes current to rt's firstChild
+                current = rt->firstChild;                           
                 int size = childQ.size();
                 
                 for(int i = 0; i < size; i++)
                 {
-                    p = childQ.top();                               //same process, but slightly different because nextSibling shit is complicated
-                    current->nextSibling = new TreeNode(p.second);  //Creates a new node, copying whatever is now on the top of the queue, had to make a copy constructor in TreeNode struct
-                    childQ.pop();                               
-                    current = current->nextSibling;                 //increments current towards right
+					//same process, but slightly different because nextSibling is complicated
+                    p = childQ.top(); 
+					   
+					/*Creates a new node, copying whatever is now on the top of the queue, 
+					had to make a copy constructor in TreeNode struct */                                             
+					current->nextSibling = new TreeNode(p.second);                      
+					childQ.pop();                   
+					
+					//increments current towards right            
+                    current = current->nextSibling;                 
                 }
             }
             
             return;
         }
         
-        //Unchanged
+        //Unchanged from Generic Tree
         void print_Tree(const TreeNode *rt, vector<int> & nodeLabel)
         {
             for(int i = 0; i < nodeLabel.size(); i++)
@@ -265,19 +290,23 @@ class GenericTree
             return;
         }
         
-        //Unchanged
+        //Unchanged from Generic Tree
         bool contains(const Comparable & key_val, TreeNode* rt, TreeNode* & key_loc)
         {
             bool check = false;
             
-            if(rt == NULL)           //takes care of case when tree is empty
+			//takes care of case when tree is empty
+            if(rt == NULL)           
             {
                 return false;
             }
             
-            if(key_val == rt->element)      //if key_val = root, we are done
-            {                               //else, we need to check its children 
-                key_loc = rt;               //by taking each one as a new root
+			/* If key_val == root, we are done. Otherwise we
+				must check its children recursively by taking 
+				each one as a new root */
+            if(key_val == rt->element)  
+            {    
+                key_loc = rt;     
                 return true;
             }
         
@@ -309,14 +338,14 @@ class GenericTree
             return;
         }
         
-        //only made this in order to call the private version
+        //made this in order to call the private version
         void hangLeft()
         {
             hang_left(root);
             return;
         }
         
-        //only made this in order to call the private version
+        //made this in order to call the private version
         void dumpHash()
         {
             htable.dump_hash_table();
